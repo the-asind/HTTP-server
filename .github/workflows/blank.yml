@@ -16,48 +16,39 @@ jobs:
         sudo apt-get update 
         sudo apt-get install -y build-essential cmake libssl-dev curl expect-dev expect
         git submodule update --init --recursive
-        
     - name: Configure CMake
       run: |
-        cd src/server
         cmake -S . -B build
-
     - name: Build server
       run: |
-        cd src/server
         cmake --build build --target server
-
     - name: Build client
       run: |
-        cd src/server
         cmake --build build --target client
-
     - name: Deploy
       run: |
         mkdir -p deploy
-        cp ./server/build/server deploy/server
-        cp ./server/build/client deploy/client
-
+        cp ./build/server deploy/server
+        cp ./build/client deploy/client
     - name: Run server tests
       run: |
         deploy/server &  # запуск сервера в фоновом режиме
         sleep 3  # ожидание, чтобы сервер успел запуститься
         curl http://localhost:7777/users  # выполнение запроса к серверу
         kill %1  # остановка сервера
-
     - name: Run client tests
       run: |
         expect -c '
-          spawn ./deploy/client
-          expect {
-            -re ".*" {
-            # Output received, continue
-            }
-          }
-          send "7\n"
-          expect eof
+        spawn ./deploy/client
+        expect {
+         -re ".*" {
+         # Output received, continue
+         }
+        }
+        send "127.0.0.1\n"
+        send "7777\n"
+        expect eof
         '
-        
     - name: Package the binaries
       run: |
         sh create_debpkg.sh
