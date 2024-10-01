@@ -62,7 +62,7 @@ jobs:
       run: |
         sh create_debpkg.sh
     - name: Upload Deb Package to artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: app
         path: ./http-server-dcsa.deb  # Укажите путь к созданному deb-пакету
@@ -70,7 +70,7 @@ jobs:
       run: |
         sh create_dpkg_client.sh
     - name: Upload client Deb Package to artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: app-client
         path: ./http-server-client-dcsa.deb  # Укажите путь к созданному deb-пакету
