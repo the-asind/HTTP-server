@@ -19,17 +19,17 @@ jobs:
         
     - name: Configure CMake
       run: |
-        cd server
+        cd src/server
         cmake -S . -B build
 
     - name: Build server
       run: |
-        cd server
+        cd src/server
         cmake --build build --target server
 
     - name: Build client
       run: |
-        cd server
+        cd src/server
         cmake --build build --target client
 
     - name: Deploy
