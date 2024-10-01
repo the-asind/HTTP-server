@@ -1,0 +1,79 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches:
+      - origin/develop
+  pull_request:
+    branches:
+      - origin/develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt-get update 
+        sudo apt-get install -y build-essential cmake libssl-dev curl expect-dev expect
+        git submodule update --init --recursive
+        
+    - name: Configure CMake
+      run: |
+        cd server
+        cmake -S . -B build
+
+    - name: Build server
+      run: |
+        cd server
+        cmake --build build --target server
+
+    - name: Build client
+      run: |
+        cd server
+        cmake --build build --target client
+
+    - name: Deploy
+      run: |
+        mkdir -p deploy
+        cp ./server/build/server deploy/server
+        cp ./server/build/client deploy/client
+
+    - name: Run server tests
+      run: |
+        deploy/server &  # запуск сервера в фоновом режиме
+        sleep 3  # ожидание, чтобы сервер успел запуститься
+        curl http://localhost:7777/users  # выполнение запроса к серверу
+        kill %1  # остановка сервера
+
+    - name: Run client tests
+      run: |
+        expect -c '
+          spawn ./deploy/client
+          expect {
+            -re ".*" {
+            # Output received, continue
+            }
+          }
+          send "7\n"
+          expect eof
+        '
+        
+    - name: Package the binaries
+      run: |
+        sh create_debpkg.sh
+    - name: Upload Deb Package to artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: ./http-server-dcsa.deb  # Укажите путь к созданному deb-пакету
+    - name: Package the binaries client
+      run: |
+        sh create_dpkg_client.sh
+    - name: Upload client Deb Package to artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-client
+        path: ./http-server-client-dcsa.deb  # Укажите путь к созданному deb-пакету
