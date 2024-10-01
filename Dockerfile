@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Clone the repository and its submodules
-ARG REPO_URL
+ARG REPO_URL=https://github.com/the-asind/HTTP-server.git
 ARG REPO_BRANCH=main
 RUN git clone --branch ${REPO_BRANCH} --recurse-submodules ${REPO_URL} .
 
