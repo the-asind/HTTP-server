@@ -15,11 +15,10 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory
 WORKDIR /app
 
-# Copy the source code into the container
-COPY . /app
-
-# Initialize and update git submodules
-RUN git submodule update --init --recursive
+# Clone the repository and its submodules
+ARG REPO_URL
+ARG REPO_BRANCH=main
+RUN git clone --branch ${REPO_BRANCH} --recurse-submodules ${REPO_URL} .
 
 # Configure and build the project
 RUN cmake -S . -B build
