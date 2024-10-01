@@ -10,6 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # маркер артифакт по бланку
+      - name: Download build completion marker
+        uses: actions/download-artifact@v2
+        with:
+          name: build-completion
+          path: /tmp/build-completion/marker-file  # Ensure this path matches the upload path
+
       # Шаги для сборки бинарных файлов
       - uses: actions/checkout@v2
       

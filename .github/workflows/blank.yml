@@ -3,10 +3,7 @@ name: C/C++ CI
 on:
   push:
     branches:
-      - origin/develop
-  pull_request:
-    branches:
-      - origin/develop
+      - main
 
 jobs:
   build:
@@ -77,3 +74,10 @@ jobs:
       with:
         name: app-client
         path: ./http-server-client-dcsa.deb  # Укажите путь к созданному deb-пакету
+
+    # New step to upload a marker artifact
+    - name: Upload build completion marker
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-completion
+        path: /tmp/build-completion/marker-file  # Create or use a file as a marker
